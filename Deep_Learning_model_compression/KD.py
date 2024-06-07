@@ -76,18 +76,21 @@ class DistillationLoss(nn.Module):
         student_loss = nn.MSELoss()(student_outputs, targets)
         return distillation_loss + student_loss
 
-# 모델 초기화
-input_size = 5
-hidden_size = 20
-num_layers = 2
-output_size = 1
+
+
 
 teacher_model = LSTMNet(5, 64, 2, 1)
+
+# 모델 초기화
+input_size = 5
+hidden_size = 32
+num_layers = 2
+output_size = 1
 student_model = SmallLSTMNet(input_size, hidden_size, num_layers, output_size)
 
 # Teacher 모델 로드 (path_to_your_teacher_model.pth를 실제 파일 경로로 변경)
 model_path = 'LSTM\\model\\LSTM_model_1.pt'
-model_data = torch.load(model_path)
+model_data = torch.jit.load(model_path)
 
 teacher_model.load_state_dict(model_data.state_dict())
 teacher_model.eval()
@@ -97,7 +100,7 @@ optimizer = optim.Adam(student_model.parameters(), lr=0.001)
 temperature = 5.0
 criterion = DistillationLoss(temperature)
 
-num_epochs = 10
+num_epochs = 50
 
 for epoch in range(num_epochs):
     student_model.train()
@@ -117,6 +120,12 @@ for epoch in range(num_epochs):
 
     print(f"Epoch {epoch + 1}, Loss: {running_loss / len(train_loader)}")
 
-# Student 모델 저장
-torch.save(student_model.state_dict(), 'student_model.pth')
-print("Student model training complete and saved as 'student_model.pth'")
+# # Student 모델 저장
+# torch.save(student_model.state_dict(), 'student_model.pt')
+
+# 모델을 TorchScript로 변환
+scripted_model = torch.jit.script(student_model)
+# TorchScript 모델 저장
+torch.jit.save(scripted_model, 'student_model.pt')
+
+print("Student model training complete and saved as 'student_model.pt'")
