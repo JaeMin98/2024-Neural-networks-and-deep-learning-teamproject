@@ -7,12 +7,12 @@ from torch.utils.data import DataLoader, TensorDataset
 
 
 # 데이터 파일 경로 설정
-dataset_list = [
+dataset_list = [('dataset\\traindata\\train_var_mu.csv',10),
                 ('dataset\\testdata\\DLC_50kph_1.0_10ms.csv',100),
                 ('dataset\\testdata\\DLC_tight_1.0_10ms.csv',100),
-                ('dataset\\testdata\\test_0.4_10ms.csv',10),
-                ('dataset\\testdata\\test_0.6_10ms.csv',10),
-                ('dataset\\testdata\\test_0.85_10ms.csv',10)
+                ('dataset\\testdata\\test_0.4_10ms.csv',30),
+                ('dataset\\testdata\\test_0.6_10ms.csv',30),
+                ('dataset\\testdata\\test_0.85_10ms.csv',30)
                 ]
 
 all_x_data = []
@@ -95,9 +95,7 @@ class DistillationLoss(nn.Module):
         self.criterion = nn.KLDivLoss(reduction='batchmean')
 
     def forward(self, student_outputs, teacher_outputs, targets):
-        soft_targets = torch.softmax(teacher_outputs / self.temperature, dim=1)
-        soft_student_outputs = torch.log_softmax(student_outputs / self.temperature, dim=1)
-        distillation_loss = self.criterion(soft_student_outputs, soft_targets) * (self.temperature ** 2)
+        distillation_loss = nn.MSELoss()(student_outputs, teacher_outputs)
         student_loss = nn.MSELoss()(student_outputs, targets)
         return distillation_loss + student_loss
 
