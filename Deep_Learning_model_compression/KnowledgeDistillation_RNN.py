@@ -6,6 +6,10 @@ import torch.optim as optim
 
 torch.autograd.set_detect_anomaly(True)
 
+# 장치 설정 (GPU가 가능하면 GPU를 사용하고, 아니면 CPU를 사용)
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(f"Using device: {device}")
+
 def RNN_light_weight(model_path, hidden_size, num_layers, num_of_epoch, num_of_epoch2=0):
     dataset_list = [
         ('dataset\\traindata\\train_var_mu.csv', num_of_epoch2),
@@ -24,8 +28,8 @@ def RNN_light_weight(model_path, hidden_size, num_layers, num_of_epoch, num_of_e
     print("=== Train data file path ===", "\n", file_path)
 
     data = pd.read_csv(file_path, sep=",", header=0, dtype=float)
-    x_data = torch.tensor(data.iloc[:, [0, 2, 3, 4, 5]].values, dtype=torch.float32)
-    y_data = torch.tensor(data.iloc[:, 1:2].values, dtype=torch.float32)
+    x_data = torch.tensor(data.iloc[:, [0, 2, 3, 4, 5]].values, dtype=torch.float32).to(device)
+    y_data = torch.tensor(data.iloc[:, 1:2].values, dtype=torch.float32).to(device)
 
     all_x_data.append(x_data)
     all_y_data.append(y_data)
@@ -41,8 +45,8 @@ def RNN_light_weight(model_path, hidden_size, num_layers, num_of_epoch, num_of_e
         print("=== Test data file path ===", "\n", file_path)
 
         test_data = pd.read_csv(file_path, sep=",", header=0, dtype=float)
-        test_x_data = torch.tensor(test_data.iloc[:, [0, 2, 3, 4, 5]].values, dtype=torch.float32)
-        test_y_data = torch.tensor(test_data.iloc[:, 1:2].values, dtype=torch.float32)
+        test_x_data = torch.tensor(test_data.iloc[:, [0, 2, 3, 4, 5]].values, dtype=torch.float32).to(device)
+        test_y_data = torch.tensor(test_data.iloc[:, 1:2].values, dtype=torch.float32).to(device)
         test_x_data_normalized = (test_x_data - mean_x) / std_x
         
         return test_x_data, test_y_data, test_x_data_normalized
@@ -78,16 +82,17 @@ def RNN_light_weight(model_path, hidden_size, num_layers, num_of_epoch, num_of_e
             student_loss = nn.MSELoss()(student_outputs, targets)
             return distillation_loss + student_loss
 
-    student_model = SmallRNN_Net()
+    student_model = SmallRNN_Net().to(device)
 
     teacher_model = torch.jit.load(model_path)
+    teacher_model.to(device)
     teacher_model.eval()
 
     optimizer = optim.Adam(student_model.parameters(), lr=0.001)
     temperature = 2.0
     criterion = DistillationLoss(temperature)
-    prev_predictions_T = torch.zeros(1, 1)
-    prev_predictions_S = torch.zeros(1, 1)
+    prev_predictions_T = torch.zeros(1, 1).to(device)
+    prev_predictions_S = torch.zeros(1, 1).to(device)
 
     for dataset_path, num_epochs in dataset_list:
         test_x_data, test_y_data, test_x_data_normalized = csv_data_loader(dataset_path)
@@ -120,3 +125,6 @@ def RNN_light_weight(model_path, hidden_size, num_layers, num_of_epoch, num_of_e
     torch.jit.save(scripted_model, f'RNN_student_model_{hidden_size}_{num_layers}_{num_of_epoch}.pt')
 
     print("Student model training complete and saved")
+
+# 모델 학습 실행 예시
+# RNN_light_weight('path_to_teacher_model.pt', hidden_size=128, num_layers=2, num_of_epoch=10)
