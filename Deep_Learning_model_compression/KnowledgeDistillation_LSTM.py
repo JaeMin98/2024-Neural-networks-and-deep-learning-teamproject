@@ -157,16 +157,3 @@ def LSTM_light_weight(model_path, hidden_size, num_layers, num_of_epoch):
     torch.jit.save(scripted_model, 'LSTM_student_model_{0}_{1}_{2}.pt'.format(hidden_size,num_layers,num_of_epoch))
 
     print("Student model training complete and saved")
-
-num_of_epoch = 0
-
-hidden_size = 32
-num_layers = 2
-model_path = 'LSTM\\model\\LSTM_model_1.pt'
-LSTM_light_weight(model_path, hidden_size, num_layers, num_of_epoch)
-
-
-hidden_size = 16
-num_layers = 2
-model_path = 'LSTM\\model\\LSTM_model_1.pt'
-LSTM_light_weight(model_path, hidden_size, num_layers, num_of_epoch)

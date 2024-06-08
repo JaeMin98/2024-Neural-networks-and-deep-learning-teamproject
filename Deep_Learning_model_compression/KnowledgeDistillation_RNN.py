@@ -6,7 +6,7 @@ import torch.optim as optim
 
 torch.autograd.set_detect_anomaly(True)
 
-def LSTM_light_weight(model_path, hidden_size, num_layers, num_of_epoch):
+def RNN_light_weight(model_path, hidden_size, num_layers, num_of_epoch):
     dataset_list = [
         ('dataset\\traindata\\train_var_mu.csv', 0),
         ('dataset\\testdata\\DLC_50kph_1.0_10ms.csv', 1),
@@ -120,15 +120,3 @@ def LSTM_light_weight(model_path, hidden_size, num_layers, num_of_epoch):
     torch.jit.save(scripted_model, f'RNN_student_model_{hidden_size}_{num_layers}_{num_of_epoch}.pt')
 
     print("Student model training complete and saved")
-
-num_of_epoch = 0
-
-hidden_size = 32
-num_layers = 2
-model_path = 'RNN\\model\\RNN_model_1.pt'
-LSTM_light_weight(model_path, hidden_size, num_layers, num_of_epoch)
-
-hidden_size = 16
-num_layers = 2
-model_path = 'RNN\\model\\RNN_model_1.pt'
-LSTM_light_weight(model_path, hidden_size, num_layers, num_of_epoch)
