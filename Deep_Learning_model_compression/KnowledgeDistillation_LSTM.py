@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader, TensorDataset
 
 
 
-def LSTM_light_weight(model_path, hidden_size, num_layers, num_of_epoch, num_of_epoch2 = 0):
+def LSTM_light_weight(model_path, hidden_size, num_layers, num_of_epoch, num_of_epoch2 =0):
     # 데이터 파일 경로 설정
     dataset_list = [('dataset\\traindata\\train_var_mu.csv',num_of_epoch2),
                     ('dataset\\testdata\\DLC_50kph_1.0_10ms.csv',num_of_epoch),
