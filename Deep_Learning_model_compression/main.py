@@ -8,7 +8,7 @@ num_of_epoch2 = 0
 
 for i in range(1,100):
     num_of_epoch = i
-    num_of_epoch2 = 0
+    num_of_epoch2 = i
 
     if(num_of_epoch2 >3) : num_of_epoch2 = 3
 
