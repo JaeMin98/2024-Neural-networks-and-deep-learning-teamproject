@@ -1,0 +1,4 @@
+model name,Total number of predictions,min Prediction time,max Prediction time,average Prediction time,Percentage of predicted time longer than QoS
+RNN_16_16_model_1,56728,0.0,0.062587,0.000136,13.5
+RNN_32_32_model_1,56728,0.0,0.008004,0.000161,16.07
+RNN_64_64_model_1,56728,0.0,0.006001,0.000175,17.44
