@@ -1,0 +1,6 @@
+model name,Total number of predictions,min Prediction time,max Prediction time,average Prediction time,Percentage of predicted time longer than QoS
+LSTM_16_16_16_model_1,56728,0.0,0.044998,0.00053,52.56,0.039201
+LSTM_16_16_model_1,56728,0.0,0.007511,0.000316,31.54,0.04074
+LSTM_32_32_32_model_1,56728,0.0,0.006,0.000579,57.56,0.041338
+LSTM_32_32_model_1,56728,0.0,0.010001,0.000347,34.55,0.042183
+LSTM_64_64_model_1,56728,0.0,0.008001,0.000351,34.98,0.041631

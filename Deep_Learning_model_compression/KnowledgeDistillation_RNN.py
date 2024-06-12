@@ -54,7 +54,7 @@ def RNN_light_weight(model_path, hidden_size, num_layers, num_of_epoch, num_of_e
     class SmallRNN_Net(torch.nn.Module):
         def __init__(self):
             super(SmallRNN_Net, self).__init__()
-            self.fc1 = torch.nn.Linear(6, hidden_size)
+            self.fc1 = torch.nn.Linear(5, hidden_size)
             self.fc2 = torch.nn.Linear(hidden_size, hidden_size)
             self.fc3 = torch.nn.Linear(hidden_size, 1)
             self.ln1 = torch.nn.LayerNorm(hidden_size)
@@ -77,6 +77,7 @@ def RNN_light_weight(model_path, hidden_size, num_layers, num_of_epoch, num_of_e
             self.criterion = nn.KLDivLoss(reduction='batchmean')
 
         def forward(self, student_outputs, teacher_outputs, targets):
+            teacher_outputs = teacher_outputs.view_as(student_outputs)
             distillation_loss = nn.MSELoss()(student_outputs, teacher_outputs)
             targets = targets.view_as(student_outputs)
             student_loss = nn.MSELoss()(student_outputs, targets)
@@ -101,18 +102,14 @@ def RNN_light_weight(model_path, hidden_size, num_layers, num_of_epoch, num_of_e
             student_model.train()
             running_loss = 0.0
             for i in range(len(test_x_data)):
-                inputs = test_x_data_normalized[i].unsqueeze(0)
+                inputs = test_x_data_normalized[i].unsqueeze(0).unsqueeze(0)
                 
                 optimizer.zero_grad()
 
                 with torch.no_grad():
-                    current_input_T = torch.cat([inputs, prev_predictions_T.detach()], dim=1)
-                    teacher_outputs = teacher_model(current_input_T)
-                    prev_predictions_T = teacher_outputs
+                    teacher_outputs = teacher_model(inputs)
 
-                current_input_S = torch.cat([inputs, prev_predictions_S.detach()], dim=1)
-                student_outputs = student_model(current_input_S)
-                prev_predictions_S = student_outputs
+                student_outputs = student_model(inputs)
 
                 loss = criterion(student_outputs, teacher_outputs, test_y_data[i])
                 loss.backward(retain_graph=True)
